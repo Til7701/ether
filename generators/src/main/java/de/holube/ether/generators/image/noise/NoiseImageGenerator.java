@@ -17,16 +17,15 @@ public class NoiseImageGenerator implements ImageGenerator {
 
     @Override
     public ImageGeneratorResult generate() {
-        OpenSimplexNoise noise = new OpenSimplexNoise(seed);
-
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                double n = noise.eval(
+                double n = OpenSimplex2S.noise2(
+                        seed,
                         x * NOISE_SCALE,
-                        y * NOISE_SCALE,
-                        0
+                        y * NOISE_SCALE
                 );
+                System.out.println("Noise value at (" + x + ", " + y + "): " + n);
                 int color = (int) (n * 0x000F00);
                 image.setRGB(x, y, color);
             }
