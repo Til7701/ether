@@ -9,29 +9,31 @@ import java.awt.image.BufferedImage;
 @RequiredArgsConstructor
 public class NoiseImageGenerator implements ImageGenerator {
 
-    private static final double NOISE_SCALE = 0.01;
-
-    private final long seed;
     private final int width;
     private final int height;
+    private final long seed;
+    private final double scale;
 
     @Override
     public ImageGeneratorResult generate() {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                double n = OpenSimplex2S.noise2(
-                        seed,
-                        x * NOISE_SCALE,
-                        y * NOISE_SCALE
-                );
-                System.out.println("Noise value at (" + x + ", " + y + "): " + n);
-                int color = (int) (n * 0x000F00);
-                image.setRGB(x, y, color);
+                shader(x, y, seed, scale, image);
             }
         }
 
         return new ImageGeneratorResult(image);
+    }
+
+    private static void shader(int x, int y, long seed, double scale, BufferedImage image) {
+        double n = OpenSimplex2S.noise2(
+                seed,
+                x * scale,
+                y * scale
+        );
+        int color = (int) (n * 0x000F00);
+        image.setRGB(x, y, color);
     }
 
 }

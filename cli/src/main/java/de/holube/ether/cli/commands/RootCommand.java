@@ -5,7 +5,7 @@ import picocli.CommandLine;
 @CommandLine.Command(
         name = "ether",
         mixinStandardHelpOptions = true,
-        versionProvider = VersionProvider.class,
+        version = "ether v${ether.version}",
         description = "An image and video generation tool.",
         subcommands = {
                 GenerateImageCommand.class

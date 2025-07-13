@@ -8,9 +8,8 @@ import java.io.File;
 @SuppressWarnings("FieldMayBeFinal")
 @CommandLine.Command(
         name = "image",
-        mixinStandardHelpOptions = true,
-        versionProvider = VersionProvider.class,
         description = "Generate an image.",
+        sortOptions = false,
         subcommands = {
                 GenerateImageNoiseCommand.class
         }
@@ -18,27 +17,31 @@ import java.io.File;
 @Getter
 public class GenerateImageCommand {
 
+    @CommandLine.Mixin
+    private HelpMixin helpMixin;
+
     @CommandLine.Option(
             names = {"-o", "--output"},
             description = "Path to the output file.",
-            defaultValue = "output.png",
-            showDefaultValue = CommandLine.Help.Visibility.ALWAYS
+            paramLabel = "<path/to/file.png>",
+            showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
+            scope = CommandLine.ScopeType.INHERIT
     )
     private File outputFile = new File("output.png");
 
     @CommandLine.Option(
-            names = {"-w", "--width"},
+            names = {"--width"},
             description = "Width of the generated image.",
-            defaultValue = "800",
-            showDefaultValue = CommandLine.Help.Visibility.ALWAYS
+            showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
+            scope = CommandLine.ScopeType.INHERIT
     )
     private int width = 800;
 
     @CommandLine.Option(
-            names = {"-h", "--height"},
+            names = {"--height"},
             description = "Height of the generated image.",
-            defaultValue = "600",
-            showDefaultValue = CommandLine.Help.Visibility.ALWAYS
+            showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
+            scope = CommandLine.ScopeType.INHERIT
     )
     private int height = 600;
 

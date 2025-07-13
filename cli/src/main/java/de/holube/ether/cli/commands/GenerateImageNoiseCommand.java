@@ -12,11 +12,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @CommandLine.Command(
         name = "noise",
-        mixinStandardHelpOptions = true,
-        versionProvider = VersionProvider.class,
-        description = "Generate an image containing noise."
+        description = "Generate an image containing noise.",
+        sortOptions = false
 )
 public class GenerateImageNoiseCommand implements Callable<Integer> {
+
+    @CommandLine.Mixin
+    private HelpMixin helpMixin;
 
     @SuppressWarnings("unused")
     @CommandLine.ParentCommand
@@ -24,17 +26,26 @@ public class GenerateImageNoiseCommand implements Callable<Integer> {
 
     @SuppressWarnings("FieldMayBeFinal")
     @CommandLine.Option(
-            names = {"-s", "--seed"},
+            names = {"--seed"},
             description = "Seed for the noise generator."
     )
     private long seed = ThreadLocalRandom.current().nextLong();
 
+    @SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
+    @CommandLine.Option(
+            names = {"--scale"},
+            description = "Scale for the noise generator.",
+            showDefaultValue = CommandLine.Help.Visibility.ALWAYS
+    )
+    private double scale = 0.01;
+
     @Override
     public Integer call() {
         NoiseImageGenerator generator = new NoiseImageGenerator(
-                seed,
                 parentCommand.width(),
-                parentCommand.height()
+                parentCommand.height(),
+                seed,
+                scale
         );
 
         ImageGeneratorResult imageResult = generator.generate();
