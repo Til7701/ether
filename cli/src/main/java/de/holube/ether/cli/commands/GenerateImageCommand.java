@@ -12,7 +12,8 @@ import java.io.File;
         description = "Generate an image.",
         sortOptions = false,
         subcommands = {
-                GenerateImageNoiseCommand.class
+                GenerateImageNoiseCommand.class,
+                GenerateImageFractalCommand.class
         }
 )
 @Getter
