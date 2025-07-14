@@ -8,4 +8,5 @@ module ether.cli {
     opens de.holube.ether.cli.commands to info.picocli;
 
     exports de.holube.ether.cli;
+    opens de.holube.ether.cli.mixins to info.picocli;
 }

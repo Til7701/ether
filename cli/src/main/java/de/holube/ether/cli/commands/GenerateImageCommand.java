@@ -1,5 +1,6 @@
 package de.holube.ether.cli.commands;
 
+import de.holube.ether.cli.mixins.HelpMixin;
 import lombok.Getter;
 import picocli.CommandLine;
 
@@ -15,7 +16,7 @@ import java.io.File;
         }
 )
 @Getter
-public class GenerateImageCommand {
+public final class GenerateImageCommand {
 
     @CommandLine.Mixin
     private HelpMixin helpMixin;

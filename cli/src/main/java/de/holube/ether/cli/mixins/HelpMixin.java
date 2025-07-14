@@ -1,10 +1,10 @@
-package de.holube.ether.cli.commands;
+package de.holube.ether.cli.mixins;
 
 import lombok.Getter;
 import picocli.CommandLine;
 
 @CommandLine.Command
-public class HelpMixin {
+public final class HelpMixin {
 
     @CommandLine.Option(
             names = {"-h", "--help"},

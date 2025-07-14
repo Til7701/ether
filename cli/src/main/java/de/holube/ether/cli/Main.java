@@ -4,7 +4,7 @@ package de.holube.ether.cli;
 import de.holube.ether.cli.commands.RootCommand;
 import picocli.CommandLine;
 
-public class Main {
+public final class Main {
 
     public static void main(String[] args) {
         CommandLine.Help.ColorScheme colorScheme = new CommandLine.Help.ColorScheme.Builder()
@@ -19,6 +19,7 @@ public class Main {
                 .build();
         CommandLine cli = new CommandLine(new RootCommand());
         cli.setColorScheme(colorScheme);
+        cli.setCaseInsensitiveEnumValuesAllowed(true);
 
         int exitCode = cli.execute(args);
 
