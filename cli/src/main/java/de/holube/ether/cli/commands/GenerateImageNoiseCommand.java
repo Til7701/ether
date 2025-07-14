@@ -1,10 +1,8 @@
 package de.holube.ether.cli.commands;
 
+import de.holube.ether.cli.color.ColorFactoryFactory;
 import de.holube.ether.cli.mixins.HelpMixin;
-import de.holube.ether.cli.mixins.NoiseColorMixin;
-import de.holube.ether.generators.color.GrayscaleNoiseColorFactory;
-import de.holube.ether.generators.color.HueNoiseColorFactory;
-import de.holube.ether.generators.color.NoiseColorFactory;
+import de.holube.ether.cli.mixins.RangeColorMixin;
 import de.holube.ether.generators.image.ImageGeneratorResult;
 import de.holube.ether.generators.image.noise.NoiseImageGenerator;
 import picocli.CommandLine;
@@ -28,7 +26,7 @@ public final class GenerateImageNoiseCommand implements Callable<Integer> {
 
     @SuppressWarnings("unused")
     @CommandLine.Mixin
-    private NoiseColorMixin noiseColorMixin;
+    private RangeColorMixin rangeColorMixin;
 
     @SuppressWarnings("unused")
     @CommandLine.ParentCommand
@@ -56,7 +54,7 @@ public final class GenerateImageNoiseCommand implements Callable<Integer> {
                 parentCommand.height(),
                 seed,
                 scale,
-                noiseColorFactory()
+                ColorFactoryFactory.create(rangeColorMixin)
         );
 
         ImageGeneratorResult imageResult = generator.generate();
@@ -72,17 +70,6 @@ public final class GenerateImageNoiseCommand implements Callable<Integer> {
         }
 
         return 0;
-    }
-
-    private NoiseColorFactory noiseColorFactory() {
-        return switch (noiseColorMixin.type()) {
-            case GRAYSCALE -> new GrayscaleNoiseColorFactory();
-            case HUE -> new HueNoiseColorFactory();
-            case DUAL -> new de.holube.ether.generators.color.DualNoiseColorFactory(
-                    noiseColorMixin.color1(),
-                    noiseColorMixin.color2()
-            );
-        };
     }
 
 }

@@ -1,6 +1,6 @@
 package de.holube.ether.generators.image.noise;
 
-import de.holube.ether.generators.color.NoiseColorFactory;
+import de.holube.ether.generators.color.RangeColorFactory;
 import de.holube.ether.generators.image.ImageGenerator;
 import de.holube.ether.generators.image.ImageGeneratorResult;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class NoiseImageGenerator implements ImageGenerator {
     private final int height;
     private final long seed;
     private final double scale;
-    private final NoiseColorFactory colorFactory;
+    private final RangeColorFactory colorFactory;
 
     @Override
     public ImageGeneratorResult generate() {
