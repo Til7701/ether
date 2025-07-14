@@ -78,6 +78,10 @@ public final class GenerateImageNoiseCommand implements Callable<Integer> {
         return switch (noiseColorMixin.type()) {
             case GRAYSCALE -> new GrayscaleNoiseColorFactory();
             case HUE -> new HueNoiseColorFactory();
+            case DUAL -> new de.holube.ether.generators.color.DualNoiseColorFactory(
+                    noiseColorMixin.color1(),
+                    noiseColorMixin.color2()
+            );
         };
     }
 
