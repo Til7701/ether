@@ -12,13 +12,14 @@
         <module>generators</module>
         <module>cli</module>
         <module>commons</module>
-        <module>graph-viz</module>
+        <module>viz</module>
     </modules>
 
     <properties>
         <java.version>24</java.version>
         <picocli.version>4.7.7</picocli.version>
         <lombok.version>1.18.38</lombok.version>
+        <javafx.version>24.0.1</javafx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
