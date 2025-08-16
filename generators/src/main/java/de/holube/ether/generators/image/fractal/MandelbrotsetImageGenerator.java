@@ -4,7 +4,6 @@ import de.holube.ether.generators.color.RangeColorFactory;
 import de.holube.ether.generators.image.ImageGenerator;
 import de.holube.ether.generators.image.ImageGeneratorResult;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.math3.complex.Complex;
 
 import java.awt.image.BufferedImage;
 import java.util.stream.IntStream;
@@ -34,7 +33,7 @@ public class MandelbrotsetImageGenerator implements ImageGenerator {
                         double real = xMin + (xMax - xMin) * x / imageWidth;
                         double imaginary = yMin + (yMax - yMin) * y / imageHeight;
 
-                        FractalResult result = mandelbrotset.calculate(new Complex(real, imaginary));
+                        FractalResult result = mandelbrotset.calculate(real, imaginary);
 
                         int color;
                         if (result.isInSet()) {

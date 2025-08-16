@@ -1,7 +1,7 @@
 package de.holube.ether.generators.image.fractal;
 
+import de.holube.ether.commons.math.ComplexNumber;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.math3.complex.Complex;
 
 @RequiredArgsConstructor
 public class Mandelbrotset implements Fractal {
@@ -9,8 +9,9 @@ public class Mandelbrotset implements Fractal {
     private final int maxIterations;
 
     @Override
-    public FractalResult calculate(Complex c) {
-        Complex z = Complex.ZERO;
+    public FractalResult calculate(double real, double imaginary) {
+        ComplexNumber c = ComplexNumber.of(real, imaginary);
+        ComplexNumber z = ComplexNumber.zero();
         int iterations = 0;
 
         while (z.abs() <= 2 && iterations < maxIterations) {
@@ -18,8 +19,8 @@ public class Mandelbrotset implements Fractal {
             iterations++;
         }
 
-        double sumOfSquares = z.getReal() * z.getReal() + z.getImaginary() * z.getImaginary();
-        double innerGradiant = z.divide(sumOfSquares).subtract(c.divide(sumOfSquares)).abs();
+        double sumOfSquares = z.real() * z.real() + z.imaginary() * z.imaginary();
+        double innerGradiant = z.divide(sumOfSquares).sub(c.divide(sumOfSquares)).abs();
 
         return new FractalResult(z.abs() <= 2, iterations, innerGradiant);
     }

@@ -1,7 +1,7 @@
 module ether.generators {
     requires java.desktop;
     requires static lombok;
-    requires commons.math3;
+    requires ether.commons;
 
     exports de.holube.ether.generators;
     exports de.holube.ether.generators.color;

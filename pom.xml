@@ -11,6 +11,7 @@
     <modules>
         <module>generators</module>
         <module>cli</module>
+        <module>commons</module>
     </modules>
 
     <properties>
