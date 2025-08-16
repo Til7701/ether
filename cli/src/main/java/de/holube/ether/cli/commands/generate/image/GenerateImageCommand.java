@@ -1,4 +1,4 @@
-package de.holube.ether.cli.commands;
+package de.holube.ether.cli.commands.generate.image;
 
 import de.holube.ether.cli.mixins.HelpMixin;
 import lombok.Getter;

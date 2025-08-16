@@ -10,4 +10,6 @@ module ether.cli {
     opens de.holube.ether.cli.type_converters to info.picocli;
 
     exports de.holube.ether.cli;
+    opens de.holube.ether.cli.commands.generate.image to info.picocli;
+    opens de.holube.ether.cli.commands.graph to info.picocli;
 }

@@ -12,6 +12,7 @@
         <module>generators</module>
         <module>cli</module>
         <module>commons</module>
+        <module>graph-viz</module>
     </modules>
 
     <properties>

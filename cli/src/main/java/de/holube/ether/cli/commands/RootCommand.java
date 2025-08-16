@@ -1,5 +1,7 @@
 package de.holube.ether.cli.commands;
 
+import de.holube.ether.cli.commands.generate.image.GenerateImageCommand;
+import de.holube.ether.cli.commands.graph.GraphCommand;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -8,7 +10,8 @@ import picocli.CommandLine;
         version = "ether v${ether.version}",
         description = "An image and video generation tool.",
         subcommands = {
-                GenerateImageCommand.class
+                GenerateImageCommand.class,
+                GraphCommand.class,
         }
 )
 public final class RootCommand {

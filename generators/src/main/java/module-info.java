@@ -8,4 +8,6 @@ module ether.generators {
     exports de.holube.ether.generators.image;
     exports de.holube.ether.generators.image.noise;
     exports de.holube.ether.generators.image.fractal;
+    exports de.holube.ether.generators.graph;
+    exports de.holube.ether.generators.graph.java;
 }
