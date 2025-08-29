@@ -1,8 +1,10 @@
 module ether.cli {
     requires ether.generators;
+    requires ether.viz;
+
+    requires static lombok;
 
     requires info.picocli;
-    requires static lombok;
     requires java.desktop;
 
     opens de.holube.ether.cli.commands to info.picocli;

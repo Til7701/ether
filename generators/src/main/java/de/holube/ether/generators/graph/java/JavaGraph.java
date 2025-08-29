@@ -1,10 +1,12 @@
 package de.holube.ether.generators.graph.java;
 
+import lombok.Getter;
 import lombok.ToString;
 
 import java.util.Map;
 import java.util.TreeMap;
 
+@Getter
 @ToString
 public class JavaGraph implements Graph {
 
