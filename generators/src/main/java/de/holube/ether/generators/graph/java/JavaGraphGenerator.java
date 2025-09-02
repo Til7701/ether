@@ -28,6 +28,10 @@ public class JavaGraphGenerator implements GraphGenerator<JavaGraph> {
             }
         }
 
+        for (JavaNode node : graph.nodes().values()) {
+            addIncomingLinks(node);
+        }
+
         return new GraphResult<>(graph);
     }
 
@@ -53,6 +57,17 @@ public class JavaGraphGenerator implements GraphGenerator<JavaGraph> {
             graph.addNode(javaNode);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void addIncomingLinks(JavaNode node) {
+        for (JavaNode n : graph.nodes().values()) {
+            final String nodeId = node.fullyQualifiedClassName();
+            for (String outgoingLinkId : n.outgoingLinks().keySet()) {
+                if (outgoingLinkId.equals(nodeId)) {
+                    node.incomingLinks().merge(n.fullyQualifiedClassName(), 1, Integer::sum);
+                }
+            }
         }
     }
 

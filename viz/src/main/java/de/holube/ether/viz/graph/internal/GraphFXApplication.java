@@ -44,7 +44,7 @@ public class GraphFXApplication extends Application {
         nodesById = nodes.stream()
                 .collect(Collectors.toMap(VizNode::id, node -> node));
         edges = visualizer.graph().nodes().stream()
-                .map(node -> node.outgoingLinkIds().stream()
+                .map(node -> node.incomingLinkIds().stream()
                         .map(linkId -> {
                             VizNode targetNode = nodesById.get(linkId);
                             if (targetNode != null) {
@@ -152,8 +152,8 @@ public class GraphFXApplication extends Application {
                     final double dy = v.y() - u.y();
                     final double distance = Math.sqrt(dx * dx + dy * dy) + 0.001; // Avoid division by zero
                     final double repulsionForce = calculateRepulsionForce(distance);
-                    final double attractionForce = v.outgoingLinkIds().contains(u.id())
-                            ? calculateAttractionForce(distance, v.outgoingLinkStrengths().get(u.id()))
+                    final double attractionForce = v.incomingLinkIds().contains(u.id())
+                            ? calculateAttractionForce(distance, v.incomingLinkStrengths().get(u.id()))
                             : 0;
 
                     if (distance < MIN_DISTANCE) {

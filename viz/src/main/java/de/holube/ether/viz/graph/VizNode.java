@@ -21,7 +21,9 @@ public class VizNode {
     @EqualsAndHashCode.Include
     private final String id;
     private final Collection<String> outgoingLinkIds;
+    private final Collection<String> incomingLinkIds;
     private final Map<String, Integer> outgoingLinkStrengths;
+    private final Map<String, Integer> incomingLinkStrengths;
     private final int outgoingLinkCount;
     private final int maxOutgoingLinkCount;
     private final int minOutgoingLinkCount;
@@ -38,17 +40,23 @@ public class VizNode {
     private double velocityY = 0;
 
     public void init() {
-        int size = calculateSizeOutgoingLinks();
+        int size = calculateSizeIncomingLinks();
         System.out.println("Node " + id + " has " + outgoingLinkCount + " outgoing links, size: " + size);
         Circle circle = new Circle(size);
         circle.setStyle("-fx-fill: lightblue; -fx-stroke: white; -fx-stroke-width: 1;");
         view.getChildren().add(circle);
         Label label = new Label(id);
-        label.setStyle("-fx-text-fill: white; -fx-font-size: 10;");
-        label.setVisible(false);
-        label.setLabelFor(view);
-        circle.hoverProperty().addListener((_, _, newVal) -> label.setVisible(newVal));
-        view.getChildren().add(label);
+        label.setStyle("-fx-text-fill: white; -fx-font-size: 20;");
+        label.widthProperty().addListener((obs, oldVal, newVal) -> {
+            label.setLayoutX(-label.getWidth() / 2);
+            label.setLayoutY(label.getHeight() / 2 + size + 5);
+        });
+        circle.hoverProperty().addListener((_, _, newVal) -> {
+            if (newVal) {
+                view.getChildren().addFirst(label);
+            } else
+                view.getChildren().remove(label);
+        });
         // Center the circle
         circle.setCenterX(0);
         circle.setCenterY(0);
