@@ -120,7 +120,7 @@ public class DefaultJavaNodeFactory implements JavaNodeFactory {
             case Signature.RefTypeSig refTypeSig -> {
                 switch (refTypeSig) {
                     case Signature.ArrayTypeSig arrayTypeSig -> {
-                        ClassDesc classDesc = ClassDesc.ofInternalName(arrayTypeSig.componentSignature().signatureString());
+                        ClassDesc classDesc = ClassDesc.ofDescriptor(arrayTypeSig.componentSignature().signatureString());
                         addClassDesc(classDesc);
                     }
                     case Signature.ClassTypeSig classTypeSig -> {
