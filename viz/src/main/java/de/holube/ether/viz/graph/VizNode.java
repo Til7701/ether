@@ -75,7 +75,7 @@ public class VizNode {
 
     private int calculateSizeIncomingLinks() {
         double incomingLinkRatio = (double) (incomingLinkCount - minIncomingLinkCount) / (maxIncomingLinkCount - minIncomingLinkCount);
-        return 5 + (int) (incomingLinkRatio * 20);
+        return 5 + (int) (incomingLinkRatio * 10);
     }
 
     private int calculateSizeOutgoingLinks() {

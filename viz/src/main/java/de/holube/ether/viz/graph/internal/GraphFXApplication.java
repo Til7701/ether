@@ -12,7 +12,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import lombok.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -25,12 +24,13 @@ public class GraphFXApplication extends Application {
     private static final int HEIGHT = 1300;
 
     private static final double ATTRACTION_FORCE_MULTIPLIER = 0.00005;
-    private static final double REPULSION_FORCE_MULTIPLIER = 0.001;
-    private static final double FORCE_TO_CENTER_MULTIPLIER = 0.0012;
+    private static final double REPULSION_FORCE_MULTIPLIER = 0.02;
+    private static final int MAX_REPULSION_DISTANCE = 500;
+    private static final double FORCE_TO_CENTER_MULTIPLIER = 0.01;
     private static final double MAX_ACCELERATION = 5;
     private static final double MAX_VELOCITY = 100;
     private static final double DAMPENING_FACTOR = 0.85;
-    private static final int MIN_DISTANCE = 50;
+    private static final int MIN_DISTANCE = 15;
     private static final double MIN_DISTANCE_CORRECTION_FACTOR = 0.5;
 
     private static GraphVisualizer<?> visualizer;
@@ -91,7 +91,6 @@ public class GraphFXApplication extends Application {
     public void start(Stage stage) {
         Pane root = new Pane();
         root.setBackground(new Background(new BackgroundFill(Color.color(0.1, 0.1, 0.1), null, null)));
-        root.scaleShapeProperty().set(true);
         Scene scene = new Scene(root, WIDTH, HEIGHT);
 
         setAllRandomly();
@@ -117,7 +116,7 @@ public class GraphFXApplication extends Application {
         new Thread(() -> {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    Thread.sleep(1);
+                    Thread.sleep(30);
                     graphRelaxingStep();
                     Platform.runLater(() -> {
                         update();
@@ -170,8 +169,8 @@ public class GraphFXApplication extends Application {
                     double attractionForce = v.incomingLinkIds().contains(u.id())
                             ? calculateAttractionForce(distance, v.incomingLinkStrengths().get(u.id()))
                             : 0;
-                    attractionForce += u.outgoingLinkIds().contains(v.id())
-                            ? calculateAttractionForce(distance, u.outgoingLinkStrengths().get(v.id()))
+                    attractionForce += v.outgoingLinkIds().contains(u.id())
+                            ? calculateAttractionForce(distance, v.outgoingLinkStrengths().get(u.id()))
                             : 0;
 
                     if (distance < MIN_DISTANCE) {
@@ -182,8 +181,13 @@ public class GraphFXApplication extends Application {
                         v.accX(v.accX() + normX * overlap * MIN_DISTANCE_CORRECTION_FACTOR);
                         v.accY(v.accY() + normY * overlap * MIN_DISTANCE_CORRECTION_FACTOR);
                     }
-                    v.accX(v.accX() + dx * repulsionForce - dx * attractionForce);
-                    v.accY(v.accY() + dy * repulsionForce - dy * attractionForce);
+                    if (distance > MAX_REPULSION_DISTANCE) {
+                        v.accX(v.accX() - dx * attractionForce);
+                        v.accY(v.accY() - dy * attractionForce);
+                    } else {
+                        v.accX(v.accX() + dx * repulsionForce - dx * attractionForce);
+                        v.accY(v.accY() + dy * repulsionForce - dy * attractionForce);
+                    }
                 }
             }
             // Apply force to center
@@ -221,17 +225,6 @@ public class GraphFXApplication extends Application {
             v.x(Math.clamp(v.x(), 0, Integer.MAX_VALUE));
             v.y(Math.clamp(v.y(), 0, Integer.MAX_VALUE));
         }
-    }
-
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @EqualsAndHashCode
-    private static class Position {
-        double x;
-        double y;
     }
 
     private double calculateAttractionForce(double distance, int strength) {
