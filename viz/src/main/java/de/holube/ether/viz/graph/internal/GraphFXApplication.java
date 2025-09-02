@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 
 public class GraphFXApplication extends Application {
 
-    private static final int WIDTH = 2400;
-    private static final int HEIGHT = 1300;
+    private static final int WIDTH = 1700;
+    private static final int HEIGHT = 900;
 
     private static final double ATTRACTION_FORCE_MULTIPLIER = 0.00005;
     private static final double REPULSION_FORCE_MULTIPLIER = 0.02;
@@ -37,6 +37,7 @@ public class GraphFXApplication extends Application {
     private static Collection<VizNode> nodes;
     private static Map<String, VizNode> nodesById;
     private static Map<Pair<VizNode, VizNode>, Line> edges;
+    private static Stage stage;
 
     public static <M> void setup(GraphVisualizer<M> visualizer) {
         GraphFXApplication.visualizer = visualizer;
@@ -89,6 +90,7 @@ public class GraphFXApplication extends Application {
 
     @Override
     public void start(Stage stage) {
+        GraphFXApplication.stage = stage;
         Pane root = new Pane();
         root.setBackground(new Background(new BackgroundFill(Color.color(0.1, 0.1, 0.1), null, null)));
         Scene scene = new Scene(root, WIDTH, HEIGHT);
@@ -157,6 +159,9 @@ public class GraphFXApplication extends Application {
     }
 
     private void graphRelaxingStep() {
+        final double windowWidth = stage.getWidth();
+        final double windowHeight = stage.getHeight();
+
         for (VizNode v : nodes) {
             v.accX(0);
             v.accY(0);
@@ -191,8 +196,8 @@ public class GraphFXApplication extends Application {
                 }
             }
             // Apply force to center
-            final double centerX = WIDTH / 2.0;
-            final double centerY = HEIGHT / 2.0;
+            final double centerX = windowWidth / 2.0;
+            final double centerY = windowHeight / 2.0;
             final double toCenterX = centerX - v.x();
             final double toCenterY = centerY - v.y();
             v.x(v.x() + toCenterX * FORCE_TO_CENTER_MULTIPLIER);
