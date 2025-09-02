@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 
 public class GraphFXApplication extends Application {
 
-    private static final int WIDTH = 1920;
-    private static final int HEIGHT = 1080;
+    private static final int WIDTH = 2400;
+    private static final int HEIGHT = 1300;
 
-    private static final double ATTRACTION_FORCE_MULTIPLIER = 0.00008;
-    private static final double REPULSION_FORCE_MULTIPLIER = 0.0005;
-    private static final double FORCE_TO_CENTER_MULTIPLIER = 0.001;
+    private static final double ATTRACTION_FORCE_MULTIPLIER = 0.00005;
+    private static final double REPULSION_FORCE_MULTIPLIER = 0.001;
+    private static final double FORCE_TO_CENTER_MULTIPLIER = 0.0012;
     private static final double MAX_ACCELERATION = 5;
     private static final double MAX_VELOCITY = 100;
     private static final double DAMPENING_FACTOR = 0.85;
@@ -43,7 +43,7 @@ public class GraphFXApplication extends Application {
         nodes = visualizer.graph().nodes();
         nodesById = nodes.stream()
                 .collect(Collectors.toMap(VizNode::id, node -> node));
-        edges = visualizer.graph().nodes().stream()
+        var incomingEdges = visualizer.graph().nodes().stream()
                 .map(node -> node.incomingLinkIds().stream()
                         .map(linkId -> {
                             VizNode targetNode = nodesById.get(linkId);
@@ -61,6 +61,26 @@ public class GraphFXApplication extends Application {
                         pair -> pair,
                         _ -> new Line()
                 ));
+        var outgoingEdges = visualizer.graph().nodes().stream()
+                .map(node -> node.outgoingLinkIds().stream()
+                        .map(linkId -> {
+                            VizNode targetNode = nodesById.get(linkId);
+                            if (targetNode != null) {
+                                return new Pair<>(node, targetNode);
+                            } else {
+                                return null;
+                            }
+                        })
+                        .filter(Objects::nonNull)
+                        .toList()
+                )
+                .flatMap(Collection::stream)
+                .collect(Collectors.toMap(
+                        pair -> pair,
+                        _ -> new Line()
+                ));
+        edges = incomingEdges;
+        edges.putAll(outgoingEdges);
     }
 
     public static void launchWindow() {
@@ -80,7 +100,7 @@ public class GraphFXApplication extends Application {
             root.getChildren().add(edge);
             edge.setStyle("-fx-stroke-width: 1;");
             // set edge color based on source node's outgoing link count
-            double hue = ((double) (pair.getKey().outgoingLinkCount())) / (pair.getKey().maxOutgoingLinkCount());
+            double hue = ((double) (pair.getKey().incomingLinkCount())) / (pair.getKey().maxIncomingLinkCount());
             edge.setStroke(Color.hsb(hue * 360, 1.0, 1.0));
         });
         for (VizNode node : nodes) {
@@ -97,7 +117,7 @@ public class GraphFXApplication extends Application {
         new Thread(() -> {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    Thread.sleep(30);
+                    Thread.sleep(1);
                     graphRelaxingStep();
                     Platform.runLater(() -> {
                         update();
@@ -152,8 +172,11 @@ public class GraphFXApplication extends Application {
                     final double dy = v.y() - u.y();
                     final double distance = Math.sqrt(dx * dx + dy * dy) + 0.001; // Avoid division by zero
                     final double repulsionForce = calculateRepulsionForce(distance);
-                    final double attractionForce = v.incomingLinkIds().contains(u.id())
+                    double attractionForce = v.incomingLinkIds().contains(u.id())
                             ? calculateAttractionForce(distance, v.incomingLinkStrengths().get(u.id()))
+                            : 0;
+                    attractionForce += u.outgoingLinkIds().contains(v.id())
+                            ? calculateAttractionForce(distance, u.outgoingLinkStrengths().get(v.id()))
                             : 0;
 
                     if (distance < MIN_DISTANCE) {
@@ -201,8 +224,8 @@ public class GraphFXApplication extends Application {
             v.velocityX(v.velocityX() * DAMPENING_FACTOR);
             v.velocityY(v.velocityY() * DAMPENING_FACTOR);
             // Keep nodes within bounds
-            v.x(Math.clamp(v.x(), 0, WIDTH));
-            v.y(Math.clamp(v.y(), 0, HEIGHT));
+            v.x(Math.clamp(v.x(), 0, Integer.MAX_VALUE));
+            v.y(Math.clamp(v.y(), 0, Integer.MAX_VALUE));
         }
     }
 
