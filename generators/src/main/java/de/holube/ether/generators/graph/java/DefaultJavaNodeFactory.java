@@ -50,6 +50,9 @@ public class DefaultJavaNodeFactory implements JavaNodeFactory {
                 1,
                 Integer::sum
         );
+        ClassDesc componentType = classDesc.componentType();
+        if (componentType != null)
+            addClassDesc(classDesc.componentType());
     }
 
 }
