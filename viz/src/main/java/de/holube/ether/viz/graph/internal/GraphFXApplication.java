@@ -30,7 +30,7 @@ public class GraphFXApplication extends Application {
     private static final double MAX_ACCELERATION = 5;
     private static final double MAX_VELOCITY = 100;
     private static final double DAMPENING_FACTOR = 0.85;
-    private static final int MIN_DISTANCE = 15;
+    private static final int MIN_DISTANCE = 30;
     private static final double MIN_DISTANCE_CORRECTION_FACTOR = 0.5;
 
     private static GraphVisualizer<?> visualizer;
