@@ -23,7 +23,7 @@ public class GraphFXApplication extends Application {
     private static final int WIDTH = 1700;
     private static final int HEIGHT = 900;
 
-    private static final double ATTRACTION_FORCE_MULTIPLIER = 0.00005;
+    private static final double ATTRACTION_FORCE_MULTIPLIER = 0.005;
     private static final double REPULSION_FORCE_MULTIPLIER = 0.022;
     private static final int MAX_REPULSION_DISTANCE = 600;
     private static final double FORCE_TO_CENTER_MULTIPLIER = 0.01;
@@ -37,6 +37,7 @@ public class GraphFXApplication extends Application {
     private static Collection<VizNode> nodes;
     private static Map<String, VizNode> nodesById;
     private static Map<Pair<VizNode, VizNode>, Line> edges;
+    private static double maxStrength;
 
     private Stage stage;
 
@@ -83,6 +84,13 @@ public class GraphFXApplication extends Application {
                 ));
         edges = incomingEdges;
         edges.putAll(outgoingEdges);
+        maxStrength = visualizer.graph().nodes().stream()
+                .mapToInt(node ->
+                        Math.max(node.outgoingLinkStrengths().values().stream().max(Integer::compare).orElse(0),
+                                node.incomingLinkStrengths().values().stream().max(Integer::compare).orElse(0))
+                )
+                .max()
+                .orElse(1);
     }
 
     public static void launchWindow() {
@@ -234,7 +242,7 @@ public class GraphFXApplication extends Application {
     }
 
     private double calculateAttractionForce(double distance, int strength) {
-        return (ATTRACTION_FORCE_MULTIPLIER * strength) * distance;
+        return (ATTRACTION_FORCE_MULTIPLIER * (strength / maxStrength)) * distance;
     }
 
     private double calculateRepulsionForce(double distance) {
