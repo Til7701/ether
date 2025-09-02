@@ -70,6 +70,7 @@ public class JavaGraphCommand implements Runnable {
                 .map(jn -> new VizNode(
                         jn.fullyQualifiedClassName(),
                         jn.outgoingLinks().keySet(),
+                        jn.outgoingLinks(),
                         jn.outgoingLinks().size(),
                         maxOutgoing,
                         minOutgoing,

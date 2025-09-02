@@ -2,21 +2,26 @@ package de.holube.ether.viz.graph;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.Collection;
+import java.util.Map;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class VizNode {
 
+    @EqualsAndHashCode.Include
     private final String id;
     private final Collection<String> outgoingLinkIds;
+    private final Map<String, Integer> outgoingLinkStrengths;
     private final int outgoingLinkCount;
     private final int maxOutgoingLinkCount;
     private final int minOutgoingLinkCount;
@@ -24,10 +29,13 @@ public class VizNode {
     private final int maxIncomingLinkCount;
     private final int minIncomingLinkCount;
 
-    private final VBox view = new VBox();
+    private final Pane view = new Pane();
 
     private double x = 0;
     private double y = 0;
+
+    private double velocityX = 0;
+    private double velocityY = 0;
 
     public void init() {
         int size = calculateSizeOutgoingLinks();
@@ -41,6 +49,17 @@ public class VizNode {
         label.setLabelFor(view);
         circle.hoverProperty().addListener((_, _, newVal) -> label.setVisible(newVal));
         view.getChildren().add(label);
+        // Center the circle
+        circle.setCenterX(0);
+        circle.setCenterY(0);
+
+        view.setOnMouseDragged(event -> {
+            x = event.getSceneX();
+            y = event.getSceneY();
+            velocityX = 0;
+            velocityY = 0;
+            event.consume();
+        });
     }
 
     private int calculateSizeIncomingLinks() {

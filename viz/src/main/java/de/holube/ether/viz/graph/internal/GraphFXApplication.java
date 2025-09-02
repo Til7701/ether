@@ -3,6 +3,7 @@ package de.holube.ether.viz.graph.internal;
 import de.holube.ether.viz.graph.GraphVisualizer;
 import de.holube.ether.viz.graph.VizNode;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -11,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import lombok.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -18,6 +20,18 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GraphFXApplication extends Application {
+
+    private static final int WIDTH = 1920;
+    private static final int HEIGHT = 1080;
+
+    private static final double ATTRACTION_FORCE_MULTIPLIER = 0.00008;
+    private static final double REPULSION_FORCE_MULTIPLIER = 0.0005;
+    private static final double FORCE_TO_CENTER_MULTIPLIER = 0.001;
+    private static final double MAX_ACCELERATION = 5;
+    private static final double MAX_VELOCITY = 100;
+    private static final double DAMPENING_FACTOR = 0.85;
+    private static final int MIN_DISTANCE = 50;
+    private static final double MIN_DISTANCE_CORRECTION_FACTOR = 0.5;
 
     private static GraphVisualizer<?> visualizer;
     private static Collection<VizNode> nodes;
@@ -57,13 +71,17 @@ public class GraphFXApplication extends Application {
     public void start(Stage stage) {
         Pane root = new Pane();
         root.setBackground(new Background(new BackgroundFill(Color.color(0.1, 0.1, 0.1), null, null)));
-        Scene scene = new Scene(root, 800, 600);
+        root.scaleShapeProperty().set(true);
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
 
         setAllRandomly();
         drawEdges();
-        edges.forEach((_, edge) -> {
+        edges.forEach((pair, edge) -> {
             root.getChildren().add(edge);
-            edge.setStyle("-fx-stroke: gray; -fx-stroke-width: 1;");
+            edge.setStyle("-fx-stroke-width: 1;");
+            // set edge color based on source node's outgoing link count
+            double hue = ((double) (pair.getKey().outgoingLinkCount())) / (pair.getKey().maxOutgoingLinkCount());
+            edge.setStroke(Color.hsb(hue * 360, 1.0, 1.0));
         });
         for (VizNode node : nodes) {
             node.init();
@@ -75,6 +93,22 @@ public class GraphFXApplication extends Application {
         stage.setTitle("Graph Visualizer");
         stage.setScene(scene);
         stage.show();
+
+        new Thread(() -> {
+            try {
+                while (!Thread.currentThread().isInterrupted()) {
+                    Thread.sleep(30);
+                    graphRelaxingStep();
+                    Platform.runLater(() -> {
+                        update();
+                        drawEdges();
+                    });
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void update() {
@@ -98,10 +132,100 @@ public class GraphFXApplication extends Application {
 
     private void setAllRandomly() {
         for (VizNode node : nodes) {
-            node.x(Math.random() * 800);
-            node.y(Math.random() * 600);
+            node.x(Math.random() * WIDTH);
+            node.y(Math.random() * HEIGHT);
         }
     }
 
+    private void graphRelaxingStep() {
+        Map<VizNode, Position> acceleration = nodes.stream()
+                .collect(Collectors.toMap(
+                        node -> node,
+                        _ -> new Position(0, 0)
+                ));
+
+        for (VizNode v : nodes) {
+            final Position acc = acceleration.get(v);
+            for (VizNode u : nodes) {
+                if (v != u) {
+                    final double dx = v.x() - u.x();
+                    final double dy = v.y() - u.y();
+                    final double distance = Math.sqrt(dx * dx + dy * dy) + 0.001; // Avoid division by zero
+                    final double repulsionForce = calculateRepulsionForce(distance);
+                    final double attractionForce = v.outgoingLinkIds().contains(u.id())
+                            ? calculateAttractionForce(distance, v.outgoingLinkStrengths().get(u.id()))
+                            : 0;
+
+                    if (distance < MIN_DISTANCE) {
+                        double overlap = MIN_DISTANCE - distance;
+                        double normX = dx / distance;
+                        double normY = dy / distance;
+
+                        acc.x += normX * overlap * MIN_DISTANCE_CORRECTION_FACTOR;
+                        acc.y += normY * overlap * MIN_DISTANCE_CORRECTION_FACTOR;
+                    }
+                    acc.x += dx * repulsionForce - dx * attractionForce;
+                    acc.y += dy * repulsionForce - dy * attractionForce;
+                }
+            }
+            // Apply force to center
+            final double centerX = WIDTH / 2.0;
+            final double centerY = HEIGHT / 2.0;
+            final double toCenterX = centerX - v.x();
+            final double toCenterY = centerY - v.y();
+            v.x(v.x() + toCenterX * FORCE_TO_CENTER_MULTIPLIER);
+            v.y(v.y() + toCenterY * FORCE_TO_CENTER_MULTIPLIER);
+            // Limit maximum acceleration to avoid excessive movement
+            final double accelerationRate = Math.sqrt(acc.x * acc.x + acc.y * acc.y);
+            if (accelerationRate > MAX_ACCELERATION) {
+                acc.x = (acc.x / accelerationRate) * MAX_ACCELERATION;
+                acc.y = (acc.y / accelerationRate) * MAX_ACCELERATION;
+            }
+        }
+
+        for (VizNode v : nodes) {
+            final Position dis = acceleration.get(v);
+            // Apply acceleration to velocity
+            v.velocityX(v.velocityX() + dis.x);
+            v.velocityY(v.velocityY() + dis.y);
+            // Limit maximum velocity to avoid excessive movement
+            final double velocityRate = Math.sqrt(v.velocityX() * v.velocityX() + v.velocityY() * v.velocityY());
+            if (velocityRate > MAX_VELOCITY) {
+                v.velocityX((v.velocityX() / velocityRate) * MAX_VELOCITY);
+                v.velocityY((v.velocityY() / velocityRate) * MAX_VELOCITY);
+            }
+            // Update position based on velocity
+            v.x(v.x() + v.velocityX());
+            v.y(v.y() + v.velocityY());
+            // Dampen velocity to simulate friction
+            v.velocityX(v.velocityX() * DAMPENING_FACTOR);
+            v.velocityY(v.velocityY() * DAMPENING_FACTOR);
+            // Keep nodes within bounds
+            v.x(Math.clamp(v.x(), 0, WIDTH));
+            v.y(Math.clamp(v.y(), 0, HEIGHT));
+        }
+    }
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @EqualsAndHashCode
+    private static class Position {
+        double x;
+        double y;
+    }
+
+    private double calculateAttractionForce(double distance, int strength) {
+        return (ATTRACTION_FORCE_MULTIPLIER * strength) * distance;
+    }
+
+    private double calculateRepulsionForce(double distance) {
+        if (distance < 1) {
+            distance = 1; // Avoid extreme repulsion at very close distances
+        }
+        return REPULSION_FORCE_MULTIPLIER / distance;
+    }
 
 }
