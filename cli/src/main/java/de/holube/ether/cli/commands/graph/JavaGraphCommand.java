@@ -44,8 +44,39 @@ public class JavaGraphCommand implements Runnable {
     }
 
     private VizGraph convertToVizGraph(JavaGraph javaGraph) {
+        final int maxOutgoing = javaGraph.nodes().values().stream()
+                .mapToInt(n -> n.outgoingLinks().size())
+                .max()
+                .orElse(0);
+        final int minOutgoing = javaGraph.nodes().values().stream()
+                .mapToInt(n -> n.outgoingLinks().size())
+                .min()
+                .orElse(0);
+        final int maxIncoming = javaGraph.nodes().values().stream()
+                .mapToInt(n -> n.incomingLinks().size())
+                .max()
+                .orElse(0);
+        final int minIncoming = javaGraph.nodes().values().stream()
+                .mapToInt(n -> n.incomingLinks().size())
+                .min()
+                .orElse(0);
+
+        System.out.println("Max outgoing links: " + maxOutgoing);
+        System.out.println("Min outgoing links: " + minOutgoing);
+        System.out.println("Max incoming links: " + maxIncoming);
+        System.out.println("Min incoming links: " + minIncoming);
+
         Collection<VizNode> vizNodes = javaGraph.nodes().values().stream()
-                .map(jn -> new VizNode(jn.fullyQualifiedClassName(), jn.outgoingLinks().keySet()))
+                .map(jn -> new VizNode(
+                        jn.fullyQualifiedClassName(),
+                        jn.outgoingLinks().keySet(),
+                        jn.outgoingLinks().size(),
+                        maxOutgoing,
+                        minOutgoing,
+                        jn.incomingLinks().size(),
+                        maxIncoming,
+                        minIncoming
+                ))
                 .toList();
         return new VizGraph(vizNodes);
     }

@@ -27,7 +27,7 @@ public class GraphFXApplication extends Application {
         nodesById = nodes.stream()
                 .collect(Collectors.toMap(VizNode::id, node -> node));
         edges = visualizer.graph().nodes().stream()
-                .map(node -> node.links().stream()
+                .map(node -> node.outgoingLinkIds().stream()
                         .map(linkId -> {
                             VizNode targetNode = nodesById.get(linkId);
                             if (targetNode != null) {
