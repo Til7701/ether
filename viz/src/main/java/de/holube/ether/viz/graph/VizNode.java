@@ -39,6 +39,9 @@ public class VizNode {
     private double velocityX = 0;
     private double velocityY = 0;
 
+    private double accX = 0;
+    private double accY = 0;
+
     public void init() {
         int size = calculateSizeIncomingLinks();
         System.out.println("Node " + id + " has " + outgoingLinkCount + " outgoing links, size: " + size);

@@ -158,14 +158,9 @@ public class GraphFXApplication extends Application {
     }
 
     private void graphRelaxingStep() {
-        Map<VizNode, Position> acceleration = nodes.stream()
-                .collect(Collectors.toMap(
-                        node -> node,
-                        _ -> new Position(0, 0)
-                ));
-
         for (VizNode v : nodes) {
-            final Position acc = acceleration.get(v);
+            v.accX(0);
+            v.accY(0);
             for (VizNode u : nodes) {
                 if (v != u) {
                     final double dx = v.x() - u.x();
@@ -184,11 +179,11 @@ public class GraphFXApplication extends Application {
                         double normX = dx / distance;
                         double normY = dy / distance;
 
-                        acc.x += normX * overlap * MIN_DISTANCE_CORRECTION_FACTOR;
-                        acc.y += normY * overlap * MIN_DISTANCE_CORRECTION_FACTOR;
+                        v.accX(v.accX() + normX * overlap * MIN_DISTANCE_CORRECTION_FACTOR);
+                        v.accY(v.accY() + normY * overlap * MIN_DISTANCE_CORRECTION_FACTOR);
                     }
-                    acc.x += dx * repulsionForce - dx * attractionForce;
-                    acc.y += dy * repulsionForce - dy * attractionForce;
+                    v.accX(v.accX() + dx * repulsionForce - dx * attractionForce);
+                    v.accY(v.accY() + dy * repulsionForce - dy * attractionForce);
                 }
             }
             // Apply force to center
@@ -199,18 +194,17 @@ public class GraphFXApplication extends Application {
             v.x(v.x() + toCenterX * FORCE_TO_CENTER_MULTIPLIER);
             v.y(v.y() + toCenterY * FORCE_TO_CENTER_MULTIPLIER);
             // Limit maximum acceleration to avoid excessive movement
-            final double accelerationRate = Math.sqrt(acc.x * acc.x + acc.y * acc.y);
+            final double accelerationRate = Math.sqrt(v.accX() * v.accX() + v.accY() * v.accY());
             if (accelerationRate > MAX_ACCELERATION) {
-                acc.x = (acc.x / accelerationRate) * MAX_ACCELERATION;
-                acc.y = (acc.y / accelerationRate) * MAX_ACCELERATION;
+                v.accX((v.accX() / accelerationRate) * MAX_ACCELERATION);
+                v.accY((v.accY() / accelerationRate) * MAX_ACCELERATION);
             }
         }
 
         for (VizNode v : nodes) {
-            final Position dis = acceleration.get(v);
             // Apply acceleration to velocity
-            v.velocityX(v.velocityX() + dis.x);
-            v.velocityY(v.velocityY() + dis.y);
+            v.velocityX(v.velocityX() + v.accX());
+            v.velocityY(v.velocityY() + v.accY());
             // Limit maximum velocity to avoid excessive movement
             final double velocityRate = Math.sqrt(v.velocityX() * v.velocityX() + v.velocityY() * v.velocityY());
             if (velocityRate > MAX_VELOCITY) {
