@@ -33,9 +33,13 @@ public class VizNode {
         int size = calculateSizeOutgoingLinks();
         System.out.println("Node " + id + " has " + outgoingLinkCount + " outgoing links, size: " + size);
         Circle circle = new Circle(size);
-        circle.setStyle("-fx-fill: lightblue; -fx-stroke: black; -fx-stroke-width: 1;");
+        circle.setStyle("-fx-fill: lightblue; -fx-stroke: white; -fx-stroke-width: 1;");
         view.getChildren().add(circle);
         Label label = new Label(id);
+        label.setStyle("-fx-text-fill: white; -fx-font-size: 10;");
+        label.setVisible(false);
+        label.setLabelFor(view);
+        circle.hoverProperty().addListener((_, _, newVal) -> label.setVisible(newVal));
         view.getChildren().add(label);
     }
 

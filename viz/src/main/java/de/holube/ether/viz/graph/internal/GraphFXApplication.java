@@ -4,7 +4,10 @@ import de.holube.ether.viz.graph.GraphVisualizer;
 import de.holube.ether.viz.graph.VizNode;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -53,6 +56,7 @@ public class GraphFXApplication extends Application {
     @Override
     public void start(Stage stage) {
         Pane root = new Pane();
+        root.setBackground(new Background(new BackgroundFill(Color.color(0.1, 0.1, 0.1), null, null)));
         Scene scene = new Scene(root, 800, 600);
 
         setAllRandomly();
@@ -98,5 +102,6 @@ public class GraphFXApplication extends Application {
             node.y(Math.random() * 600);
         }
     }
+
 
 }
