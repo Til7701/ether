@@ -24,20 +24,21 @@ public class GraphFXApplication extends Application {
     private static final int HEIGHT = 900;
 
     private static final double ATTRACTION_FORCE_MULTIPLIER = 0.00005;
-    private static final double REPULSION_FORCE_MULTIPLIER = 0.02;
-    private static final int MAX_REPULSION_DISTANCE = 500;
+    private static final double REPULSION_FORCE_MULTIPLIER = 0.022;
+    private static final int MAX_REPULSION_DISTANCE = 600;
     private static final double FORCE_TO_CENTER_MULTIPLIER = 0.01;
     private static final double MAX_ACCELERATION = 5;
     private static final double MAX_VELOCITY = 100;
     private static final double DAMPENING_FACTOR = 0.85;
     private static final int MIN_DISTANCE = 30;
-    private static final double MIN_DISTANCE_CORRECTION_FACTOR = 0.5;
+    private static final double MIN_DISTANCE_CORRECTION_FACTOR = 1;
 
     private static GraphVisualizer<?> visualizer;
     private static Collection<VizNode> nodes;
     private static Map<String, VizNode> nodesById;
     private static Map<Pair<VizNode, VizNode>, Line> edges;
-    private static Stage stage;
+
+    private Stage stage;
 
     public static <M> void setup(GraphVisualizer<M> visualizer) {
         GraphFXApplication.visualizer = visualizer;
@@ -90,7 +91,7 @@ public class GraphFXApplication extends Application {
 
     @Override
     public void start(Stage stage) {
-        GraphFXApplication.stage = stage;
+        this.stage = stage;
         Pane root = new Pane();
         root.setBackground(new Background(new BackgroundFill(Color.color(0.1, 0.1, 0.1), null, null)));
         Scene scene = new Scene(root, WIDTH, HEIGHT);
