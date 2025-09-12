@@ -64,6 +64,8 @@
                     <resourceDir>jpackage</resourceDir>
                     <javaOptions>
                         <option>-Dfile.encoding=UTF-8</option>
+                        <option>--enable-native-access=javafx.graphics</option>
+                        <option>-Djavafx.enablePreview=true</option>
                     </javaOptions>
                     <licenseFile>${project.basedir}/LICENSE</licenseFile>
                 </configuration>
