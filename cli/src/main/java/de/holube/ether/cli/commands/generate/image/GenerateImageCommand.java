@@ -29,7 +29,7 @@ public final class GenerateImageCommand {
             showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
             scope = CommandLine.ScopeType.INHERIT
     )
-    private File outputFile = new File("output.png");
+    private File outputFile = new File("output.png"); // TODO use if set
 
     @CommandLine.Option(
             names = {"--width"},

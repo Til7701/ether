@@ -8,8 +8,9 @@ import de.holube.ether.generators.image.fractal.MandelbrotsetImageGenerator;
 import picocli.CommandLine;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
@@ -71,7 +72,7 @@ public final class GenerateImageFractalCommand implements Callable<Integer> {
     private double yMax = 1.5;
 
     @Override
-    public Integer call() {
+    public Integer call() throws IOException {
         MandelbrotsetImageGenerator generator = new MandelbrotsetImageGenerator(
                 parentCommand.width(),
                 parentCommand.height(),
@@ -86,14 +87,13 @@ public final class GenerateImageFractalCommand implements Callable<Integer> {
 
         ImageGeneratorResult imageResult = generator.generate();
 
-        File outputFile = parentCommand.outputFile();
-        BufferedImage image = imageResult.result();
-        try {
-            ImageIO.write(image, "png", outputFile);
-            System.out.printf("Image generated successfully: %s%n", outputFile.getAbsolutePath());
-        } catch (Exception e) {
-            System.err.printf("Failed to write image to file: %s%n", e.getMessage());
-            return 1;
+        File tempFile = File.createTempFile("image", ".png");
+        ImageIO.write(imageResult.result(), "png", tempFile);
+        //tempFile.deleteOnExit();
+        if (Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().open(tempFile);
+        } else {
+            throw new UnsupportedOperationException("Desktop is not supported on this platform.");
         }
 
         return 0;

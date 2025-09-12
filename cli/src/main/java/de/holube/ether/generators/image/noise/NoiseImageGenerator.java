@@ -1,5 +1,6 @@
 package de.holube.ether.generators.image.noise;
 
+import de.holube.ether.commons.noise.OpenSimplex2S;
 import de.holube.ether.generators.color.RangeColorFactory;
 import de.holube.ether.generators.image.ImageGenerator;
 import de.holube.ether.generators.image.ImageGeneratorResult;

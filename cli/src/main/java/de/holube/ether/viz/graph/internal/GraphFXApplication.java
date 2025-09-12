@@ -1,5 +1,6 @@
 package de.holube.ether.viz.graph.internal;
 
+import de.holube.ether.viz.AbstractApplication;
 import de.holube.ether.viz.graph.GraphVisualizer;
 import de.holube.ether.viz.graph.VizNode;
 import javafx.application.Application;
@@ -18,7 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class GraphFXApplication extends Application {
+public class GraphFXApplication extends AbstractApplication {
 
     private static final int WIDTH = 1700;
     private static final int HEIGHT = 900;
@@ -101,7 +102,7 @@ public class GraphFXApplication extends Application {
     public void start(Stage stage) {
         this.stage = stage;
         Pane root = new Pane();
-        root.setBackground(new Background(new BackgroundFill(Color.color(0.1, 0.1, 0.1), null, null)));
+        root.setBackground(new Background(new BackgroundFill(BACKGROUND_COLOR, null, null)));
         Scene scene = new Scene(root, WIDTH, HEIGHT);
 
         setAllRandomly();

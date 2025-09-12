@@ -1,4 +1,4 @@
-package de.holube.ether.generators.image.noise;
+package de.holube.ether.commons.noise;
 // https://github.com/KdotJPG/OpenSimplex2
 
 /**
