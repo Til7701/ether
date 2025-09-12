@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>cli</artifactId>
-    <packaging>jlink</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
@@ -19,28 +19,37 @@
         </dependency>
         <dependency>
             <groupId>de.holube.ether</groupId>
-            <artifactId>generators</artifactId>
+            <artifactId>commons</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>de.holube.ether</groupId>
-            <artifactId>viz</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-jlink-plugin</artifactId>
-                <extensions>true</extensions>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <executions>
+                    <execution>
+                        <id>jlink</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jlink</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <launcher>ether=ether.cli/de.holube.ether.cli.Main</launcher>
+                    <mainClass>ether.cli/de.holube.ether.cli.Main</mainClass>
+                    <launcher>ether</launcher>
                     <noHeaderFiles>true</noHeaderFiles>
                     <noManPages>true</noManPages>
                     <stripDebug>true</stripDebug>
-                    <compress>zip-1</compress>
-                    <addOptions>-Dether.version=${project.version}</addOptions>
+                    <options>-Dether.version=${project.version}</options>
                 </configuration>
             </plugin>
             <plugin>
@@ -51,7 +60,7 @@
                     <name>Ether</name>
                     <destination>target</destination>
                     <module>ether=ether.cli/de.holube.ether.cli.Main</module>
-                    <runtimeImage>target/maven-jlink/default</runtimeImage>
+                    <runtimeImage>target/image</runtimeImage>
                     <resourceDir>jpackage</resourceDir>
                     <javaOptions>
                         <option>-Dfile.encoding=UTF-8</option>

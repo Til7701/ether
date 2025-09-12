@@ -9,10 +9,8 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>generators</module>
         <module>cli</module>
         <module>commons</module>
-        <module>viz</module>
     </modules>
 
     <properties>
