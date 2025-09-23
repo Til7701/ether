@@ -49,7 +49,12 @@
                     <noHeaderFiles>true</noHeaderFiles>
                     <noManPages>true</noManPages>
                     <stripDebug>true</stripDebug>
-                    <options>-Dether.version=${project.version}</options>
+                    <options>
+                        <option>-Dether.version=${project.version}</option>
+                        <option>-Dfile.encoding=UTF-8</option>
+                        <option>--enable-native-access=javafx.graphics</option>
+                        <option>-Djavafx.enablePreview=true</option>
+                    </options>
                 </configuration>
             </plugin>
             <plugin>
@@ -62,11 +67,7 @@
                     <module>ether=ether.cli/de.holube.ether.cli.Main</module>
                     <runtimeImage>target/image</runtimeImage>
                     <resourceDir>jpackage</resourceDir>
-                    <javaOptions>
-                        <option>-Dfile.encoding=UTF-8</option>
-                        <option>--enable-native-access=javafx.graphics</option>
-                        <option>-Djavafx.enablePreview=true</option>
-                    </javaOptions>
+
                     <licenseFile>${project.basedir}/LICENSE</licenseFile>
                 </configuration>
             </plugin>
