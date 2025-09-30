@@ -7,9 +7,6 @@ import de.holube.ether.generators.image.ImageGeneratorResult;
 import de.holube.ether.generators.image.fractal.MandelbrotsetImageGenerator;
 import picocli.CommandLine;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
@@ -86,17 +83,12 @@ public final class GenerateImageFractalCommand implements Callable<Integer> {
         );
 
         ImageGeneratorResult imageResult = generator.generate();
-
-        File tempFile = File.createTempFile("image", ".png");
-        ImageIO.write(imageResult.result(), "png", tempFile);
-        //tempFile.deleteOnExit();
-        if (Desktop.isDesktopSupported()) {
-            Desktop.getDesktop().open(tempFile);
-        } else {
-            throw new UnsupportedOperationException("Desktop is not supported on this platform.");
-        }
-
-        return 0;
+        return GenerateImageCommand.handleImageResult(
+                imageResult,
+                parentCommand.outputFile(),
+                parentCommand.parentCommand().noGUI(),
+                "Fractal"
+        );
     }
 
 }

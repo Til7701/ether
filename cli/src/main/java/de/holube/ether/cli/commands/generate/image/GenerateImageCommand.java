@@ -2,9 +2,13 @@ package de.holube.ether.cli.commands.generate.image;
 
 import de.holube.ether.cli.commands.RootCommand;
 import de.holube.ether.cli.mixins.HelpMixin;
+import de.holube.ether.generators.image.ImageGeneratorResult;
+import de.holube.ether.viz.image.ImageAppData;
+import de.holube.ether.viz.image.ImageApplication;
 import lombok.Getter;
 import picocli.CommandLine;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 
 @SuppressWarnings("FieldMayBeFinal")
@@ -49,5 +53,24 @@ public final class GenerateImageCommand {
             scope = CommandLine.ScopeType.INHERIT
     )
     private int height = 600;
+
+    public static int handleImageResult(ImageGeneratorResult result, File outputFile, boolean noGUI, String windowTitle) {
+        if (outputFile != null) {
+            try {
+                ImageIO.write(result.result(), "png", outputFile);
+                System.out.printf("Image written to %s%n", outputFile.getAbsolutePath());
+            } catch (Exception e) {
+                System.err.printf("Failed to write image to %s: %s%n", outputFile.getAbsolutePath(), e.getMessage());
+                return 1;
+            }
+        }
+
+        if (!noGUI) {
+            ImageAppData data = new ImageAppData(windowTitle, result.result());
+            ImageApplication.setup(data);
+            ImageApplication.launchWindow();
+        }
+        return 0;
+    }
 
 }
