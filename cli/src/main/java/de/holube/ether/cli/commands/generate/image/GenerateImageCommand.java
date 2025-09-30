@@ -1,5 +1,6 @@
 package de.holube.ether.cli.commands.generate.image;
 
+import de.holube.ether.cli.commands.RootCommand;
 import de.holube.ether.cli.mixins.HelpMixin;
 import lombok.Getter;
 import picocli.CommandLine;
@@ -19,6 +20,9 @@ import java.io.File;
 @Getter
 public final class GenerateImageCommand {
 
+    @CommandLine.ParentCommand
+    private RootCommand parentCommand;
+
     @CommandLine.Mixin
     private HelpMixin helpMixin;
 
@@ -26,10 +30,9 @@ public final class GenerateImageCommand {
             names = {"-o", "--output"},
             description = "Path to the output file.",
             paramLabel = "<path/to/file.png>",
-            showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
             scope = CommandLine.ScopeType.INHERIT
     )
-    private File outputFile = new File("output.png"); // TODO use if set
+    private File outputFile;
 
     @CommandLine.Option(
             names = {"--width"},

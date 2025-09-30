@@ -65,11 +65,10 @@
                     <vendor>Til7701</vendor>
                     <name>Ether</name>
                     <destination>target</destination>
+                    <module>ether.cli/de.holube.ether.cli.Main</module>
                     <runtimeImage>target/image</runtimeImage>
                     <resourceDir>jpackage</resourceDir>
                     <type>DEB</type>
-                    <linuxPackageName>ether</linuxPackageName>
-                    <licenseFile>${project.basedir}/../LICENSE</licenseFile>
                 </configuration>
             </plugin>
         </plugins>

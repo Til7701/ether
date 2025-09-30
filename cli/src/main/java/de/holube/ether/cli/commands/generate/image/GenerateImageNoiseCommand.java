@@ -9,6 +9,9 @@ import de.holube.ether.viz.image.ImageAppData;
 import de.holube.ether.viz.image.ImageApplication;
 import picocli.CommandLine;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -57,9 +60,24 @@ public final class GenerateImageNoiseCommand implements Callable<Integer> {
         );
 
         ImageGeneratorResult imageResult = generator.generate();
-        ImageAppData data = new ImageAppData("Noise", imageResult.result());
-        ImageApplication.setup(data);
-        ImageApplication.launchWindow();
+
+        if (parentCommand.outputFile() != null) {
+            File outputFile = parentCommand.outputFile();
+            BufferedImage image = imageResult.result();
+            try {
+                ImageIO.write(image, "png", outputFile);
+                System.out.printf("Image generated successfully: %s%n", outputFile.getAbsolutePath());
+            } catch (Exception e) {
+                System.err.printf("Failed to write image to file: %s%n", e.getMessage());
+                return 1;
+            }
+        }
+
+        if (!parentCommand.parentCommand().noGUI()) {
+            ImageAppData data = new ImageAppData("Noise", imageResult.result());
+            ImageApplication.setup(data);
+            ImageApplication.launchWindow();
+        }
 
         return 0;
     }

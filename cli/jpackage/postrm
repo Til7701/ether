@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Running postrm for request sink with $1"
+echo "Running postrm for ether with $1"
 if [ "$1" = 'remove' ]; then
   # remove the installation folder
   rm -rf /opt/ether/
