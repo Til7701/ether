@@ -60,62 +60,19 @@
             <plugin>
                 <groupId>org.panteleyev</groupId>
                 <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.7.0</version>
                 <configuration>
                     <vendor>Til7701</vendor>
                     <name>Ether</name>
                     <destination>target</destination>
-                    <module>ether=ether.cli/de.holube.ether.cli.Main</module>
                     <runtimeImage>target/image</runtimeImage>
                     <resourceDir>jpackage</resourceDir>
-
-                    <licenseFile>${project.basedir}/LICENSE</licenseFile>
+                    <type>DEB</type>
+                    <linuxPackageName>ether</linuxPackageName>
+                    <licenseFile>${project.basedir}/../LICENSE</licenseFile>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>linux-deb</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.panteleyev</groupId>
-                        <artifactId>jpackage-maven-plugin</artifactId>
-                        <configuration>
-                            <type>DEB</type>
-                            <linuxPackageName>ether</linuxPackageName>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>windows-msi</id>
-            <activation>
-                <os>
-                    <family>windows</family>
-                </os>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.panteleyev</groupId>
-                        <artifactId>jpackage-maven-plugin</artifactId>
-                        <configuration>
-                            <type>MSI</type>
-                            <winUpgradeUuid>54399f20-f322-4039-b459-e3877c89e998</winUpgradeUuid>
-                            <winPerUserInstall>true</winPerUserInstall>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>
