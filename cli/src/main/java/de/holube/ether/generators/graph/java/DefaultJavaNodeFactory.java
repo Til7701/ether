@@ -1,12 +1,10 @@
 package de.holube.ether.generators.graph.java;
 
 import java.lang.classfile.*;
-import java.lang.classfile.attribute.RuntimeInvisibleTypeAnnotationsAttribute;
-import java.lang.classfile.attribute.RuntimeVisibleTypeAnnotationsAttribute;
-import java.lang.classfile.attribute.StackMapTableAttribute;
+import java.lang.classfile.attribute.*;
+import java.lang.classfile.constantpool.*;
 import java.lang.classfile.instruction.*;
-import java.lang.constant.ClassDesc;
-import java.lang.constant.MethodTypeDesc;
+import java.lang.constant.*;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -23,18 +21,47 @@ public class DefaultJavaNodeFactory implements JavaNodeFactory {
         final String simpleClassName = classModel.thisClass().asSymbol().displayName();
         final String packageName = classModel.thisClass().asSymbol().packageName();
 
+        classModel.attributes().forEach(this::addAttribute);
         classModel.superclass().ifPresent(classDesc -> addClassDesc(classDesc.asSymbol()));
         classModel.interfaces().forEach(classDesc -> addClassDesc(classDesc.asSymbol()));
-        classModel.fields().forEach(field -> addClassDesc(field.fieldTypeSymbol()));
+        classModel.fields().forEach(field -> {
+            addClassDesc(field.fieldTypeSymbol());
+            field.attributes().forEach(this::addAttribute);
+        });
         classModel.methods().forEach(method -> {
             addMethodDesc(method.methodTypeSymbol());
             method.code().ifPresent(this::addCodeModel);
+            method.attributes().forEach(this::addAttribute);
         });
+        addConstantPool(classModel.constantPool());
 
         return new JavaNode(
                 simpleClassName,
                 packageName,
                 classesThisLinksTo
+        );
+    }
+
+    private void addConstantPool(ConstantPool constantPool) {
+        constantPool.forEach(entry -> {
+                    switch (entry) {
+                        case AnnotationConstantValueEntry annotationConstantValueEntry -> {
+                            addConstantDesc(annotationConstantValueEntry.constantValue());
+                        }
+                        case DynamicConstantPoolEntry dynamicConstantPoolEntry -> {
+                        }
+                        case LoadableConstantEntry loadableConstantEntry -> {
+                        }
+                        case MemberRefEntry memberRefEntry -> {
+                        }
+                        case ModuleEntry moduleEntry -> {
+                        }
+                        case NameAndTypeEntry nameAndTypeEntry -> {
+                        }
+                        case PackageEntry packageEntry -> {
+                        }
+                    }
+                }
         );
     }
 
@@ -44,6 +71,7 @@ public class DefaultJavaNodeFactory implements JavaNodeFactory {
     }
 
     private void addCodeModel(CodeModel codeModel) {
+        codeModel.attributes().forEach(this::addAttribute);
         for (CodeElement codeElement : codeModel.elementList()) {
             addCodeElement(codeElement);
         }
@@ -91,10 +119,58 @@ public class DefaultJavaNodeFactory implements JavaNodeFactory {
             case ReturnInstruction returnInstruction -> addClassDesc(returnInstruction.typeKind().upperBound());
             case StoreInstruction storeInstruction -> addClassDesc(storeInstruction.typeKind().upperBound());
             case TypeCheckInstruction typeCheckInstruction -> addClassDesc(typeCheckInstruction.type().asSymbol());
+
+            case InvokeDynamicInstruction invokeDynamicInstruction -> {
+                addMethodDesc(invokeDynamicInstruction.typeSymbol());
+                invokeDynamicInstruction.bootstrapArgs().forEach(this::addConstantDesc
+                );
+            }
+            case InvokeInstruction invokeInstruction -> {
+                addMethodDesc(invokeInstruction.typeSymbol());
+                addClassDesc(invokeInstruction.owner().asSymbol());
+            }
+            case LookupSwitchInstruction lookupSwitchInstruction -> {
+            }
+            case MonitorInstruction monitorInstruction -> {
+            }
+            case NopInstruction nopInstruction -> {
+            }
+            case StackInstruction stackInstruction -> {
+            }
+            case TableSwitchInstruction tableSwitchInstruction -> {
+            }
+            case ThrowInstruction throwInstruction -> {
+            }
             default -> {
-                // Instructions that do not reference types
+                // Other instructions that do not reference types
             }
         }
+    }
+
+    private void addConstantDesc(ConstantDesc constantDesc) {
+        switch (constantDesc) {
+            case Double aDouble -> {
+            }
+            case Float aFloat -> {
+            }
+            case Integer integer -> {
+            }
+            case Long aLong -> {
+            }
+            case String string -> {
+            }
+            case ClassDesc classDesc -> {
+                addClassDesc(classDesc);
+            }
+            case DynamicConstantDesc dynamicConstantDesc -> {
+            }
+            case MethodHandleDesc methodHandleDesc -> {
+            }
+            case MethodTypeDesc methodTypeDesc -> {
+                addMethodDesc(methodTypeDesc);
+            }
+        }
+
     }
 
     private void addPseudoInstruction(PseudoInstruction pseudoInstruction) {
@@ -108,9 +184,119 @@ public class DefaultJavaNodeFactory implements JavaNodeFactory {
             case LineNumber lineNumber -> {
             }
             case LocalVariable localVariable -> {
+                addClassDesc(localVariable.typeSymbol());
             }
             case LocalVariableType localVariableType -> addSignature(localVariableType.signatureSymbol());
         }
+    }
+
+    private void addAttribute(Attribute<?> attribute) {
+        switch (attribute) {
+            case CustomAttribute customAttribute -> {
+            }
+            case AnnotationDefaultAttribute annotationDefaultAttribute -> {
+            }
+            case BootstrapMethodsAttribute bootstrapMethodsAttribute -> {
+            }
+            case CharacterRangeTableAttribute characterRangeTableAttribute -> {
+            }
+            case CodeAttribute codeAttribute -> {
+            }
+            case CompilationIDAttribute compilationIDAttribute -> {
+            }
+            case ConstantValueAttribute constantValueAttribute -> {
+                addConstantDesc(constantValueAttribute.constant().constantValue());
+            }
+            case DeprecatedAttribute deprecatedAttribute -> {
+            }
+            case EnclosingMethodAttribute enclosingMethodAttribute -> {
+                enclosingMethodAttribute.enclosingMethodTypeSymbol().ifPresent(this::addMethodDesc);
+            }
+            case ExceptionsAttribute exceptionsAttribute -> {
+                exceptionsAttribute.exceptions().forEach(classDesc -> addClassDesc(classDesc.asSymbol()));
+            }
+            case InnerClassesAttribute innerClassesAttribute -> {
+                innerClassesAttribute.classes().forEach(innerClass -> {
+                    addClassDesc(innerClass.innerClass().asSymbol());
+                });
+            }
+            case LineNumberTableAttribute lineNumberTableAttribute -> {
+            }
+            case LocalVariableTableAttribute localVariableTableAttribute -> {
+                localVariableTableAttribute.localVariables().forEach(localVariable -> {
+                    addClassDesc(localVariable.typeSymbol());
+                });
+            }
+            case LocalVariableTypeTableAttribute localVariableTypeTableAttribute -> {
+            }
+            case MethodParametersAttribute methodParametersAttribute -> {
+            }
+            case ModuleAttribute moduleAttribute -> {
+            }
+            case ModuleHashesAttribute moduleHashesAttribute -> {
+            }
+            case ModuleMainClassAttribute moduleMainClassAttribute -> {
+            }
+            case ModulePackagesAttribute modulePackagesAttribute -> {
+            }
+            case ModuleResolutionAttribute moduleResolutionAttribute -> {
+            }
+            case ModuleTargetAttribute moduleTargetAttribute -> {
+            }
+            case NestHostAttribute nestHostAttribute -> {
+            }
+            case NestMembersAttribute nestMembersAttribute -> {
+            }
+            case PermittedSubclassesAttribute permittedSubclassesAttribute -> {
+            }
+            case RecordAttribute recordAttribute -> {
+            }
+            case RuntimeInvisibleAnnotationsAttribute runtimeInvisibleAnnotationsAttribute -> {
+                runtimeInvisibleAnnotationsAttribute.annotations().forEach(this::addAnnotation);
+            }
+            case RuntimeInvisibleParameterAnnotationsAttribute runtimeInvisibleParameterAnnotationsAttribute -> {
+                runtimeInvisibleParameterAnnotationsAttribute.parameterAnnotations().forEach(parameterAnnotation -> parameterAnnotation.forEach(this::addAnnotation));
+            }
+            case RuntimeInvisibleTypeAnnotationsAttribute runtimeInvisibleTypeAnnotationsAttribute -> {
+                runtimeInvisibleTypeAnnotationsAttribute.annotations().forEach(this::addTypeAnnotation);
+            }
+            case RuntimeVisibleAnnotationsAttribute runtimeVisibleAnnotationsAttribute -> {
+                runtimeVisibleAnnotationsAttribute.annotations().forEach(this::addAnnotation);
+            }
+            case RuntimeVisibleParameterAnnotationsAttribute runtimeVisibleParameterAnnotationsAttribute -> {
+                runtimeVisibleParameterAnnotationsAttribute.parameterAnnotations().forEach(parameterAnnotation -> parameterAnnotation.forEach(this::addAnnotation));
+            }
+            case RuntimeVisibleTypeAnnotationsAttribute runtimeVisibleTypeAnnotationsAttribute -> {
+                runtimeVisibleTypeAnnotationsAttribute.annotations().forEach(this::addTypeAnnotation);
+            }
+            case SignatureAttribute signatureAttribute -> {
+            }
+            case SourceDebugExtensionAttribute sourceDebugExtensionAttribute -> {
+            }
+            case SourceFileAttribute sourceFileAttribute -> {
+            }
+            case SourceIDAttribute sourceIDAttribute -> {
+            }
+            case StackMapTableAttribute stackMapTableAttribute -> {
+            }
+            case SyntheticAttribute syntheticAttribute -> {
+            }
+            case UnknownAttribute unknownAttribute -> {
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + attribute);
+        }
+    }
+
+    private void addTypeAnnotation(TypeAnnotation annotation) {
+        addAnnotation(annotation.annotation());
+    }
+
+    private void addAnnotation(Annotation annotation) {
+        addClassDesc(annotation.classSymbol());
+        annotation.elements().forEach(this::addAnnotationElement);
+    }
+
+    private void addAnnotationElement(AnnotationElement annotationElement) {
     }
 
     private void addSignature(Signature signature) {
