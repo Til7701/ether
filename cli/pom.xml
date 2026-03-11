@@ -53,7 +53,6 @@
                         <option>-Dether.version=${project.version}</option>
                         <option>-Dfile.encoding=UTF-8</option>
                         <option>--enable-native-access=javafx.graphics</option>
-                        <option>-Djavafx.enablePreview=true</option>
                     </options>
                 </configuration>
             </plugin>
