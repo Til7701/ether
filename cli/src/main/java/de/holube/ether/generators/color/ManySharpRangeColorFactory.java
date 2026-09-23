@@ -19,7 +19,7 @@ public class ManySharpRangeColorFactory implements RangeColorFactory {
         // Normalize the value to the range [0, 1]
         double normalizedValue = (value + 1.0) / 2.0;
         int index = (int) (normalizedValue * (colors.size()));
-        index = Math.max(0, Math.min(index, colors.size() - 1)); // Clamp index to valid range
+        index = Math.clamp(index, 0, colors.size() - 1); // Clamp index to valid range
 
         return colors.get(index).getRGB();
     }

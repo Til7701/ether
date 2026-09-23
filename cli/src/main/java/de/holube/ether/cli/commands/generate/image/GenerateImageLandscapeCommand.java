@@ -1,21 +1,20 @@
 package de.holube.ether.cli.commands.generate.image;
 
-import de.holube.ether.cli.color.ColorFactoryFactory;
 import de.holube.ether.cli.mixins.HelpMixin;
 import de.holube.ether.cli.mixins.RangeColorMixin;
 import de.holube.ether.generators.image.ImageGeneratorResult;
-import de.holube.ether.generators.image.noise.NoiseImageGenerator;
+import de.holube.ether.generators.image.landscape.LandscapeImageGenerator;
 import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
 
 @CommandLine.Command(
-        name = "noise",
-        description = "Generate an image containing noise.",
+        name = "landscape",
+        description = "Generate an image displaying a landscape.",
         sortOptions = false
 )
-public final class GenerateImageNoiseCommand implements Callable<Integer> {
+public final class GenerateImageLandscapeCommand implements Callable<Integer> {
 
     @SuppressWarnings("unused")
     @CommandLine.Mixin
@@ -32,26 +31,43 @@ public final class GenerateImageNoiseCommand implements Callable<Integer> {
     @SuppressWarnings("FieldMayBeFinal")
     @CommandLine.Option(
             names = {"--seed"},
-            description = "Seed for the noise generator."
+            description = "Seed for the landscape generator."
     )
     private long seed = ThreadLocalRandom.current().nextLong();
 
     @SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
     @CommandLine.Option(
             names = {"--scale"},
-            description = "Scale for the noise generator.",
+            description = "Scale for the landscape generator.",
             showDefaultValue = CommandLine.Help.Visibility.ALWAYS
     )
-    private double scale = 0.01;
+    private double scale = 0.001;
+
+    @SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
+    @CommandLine.Option(
+            names = {"--levels"},
+            description = "Levels of noise added up.",
+            showDefaultValue = CommandLine.Help.Visibility.ALWAYS
+    )
+    private int levels = 10;
+
+    @SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
+    @CommandLine.Option(
+            names = {"--multi"},
+            description = "Multiplier of levels.",
+            showDefaultValue = CommandLine.Help.Visibility.ALWAYS
+    )
+    private double multi = 0.5;
 
     @Override
     public Integer call() {
-        NoiseImageGenerator generator = new NoiseImageGenerator(
+        LandscapeImageGenerator generator = new LandscapeImageGenerator(
                 parentCommand.width(),
                 parentCommand.height(),
                 seed,
                 scale,
-                ColorFactoryFactory.create(rangeColorMixin)
+                levels,
+                multi
         );
 
         ImageGeneratorResult imageResult = generator.generate();
@@ -59,7 +75,7 @@ public final class GenerateImageNoiseCommand implements Callable<Integer> {
                 imageResult,
                 parentCommand.outputFile(),
                 parentCommand.parentCommand().noGUI(),
-                "Noise"
+                "Landscape"
         );
     }
 

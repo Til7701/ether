@@ -18,7 +18,8 @@ import java.io.File;
         sortOptions = false,
         subcommands = {
                 GenerateImageNoiseCommand.class,
-                GenerateImageFractalCommand.class
+                GenerateImageFractalCommand.class,
+                GenerateImageLandscapeCommand.class
         }
 )
 @Getter
@@ -36,7 +37,7 @@ public final class GenerateImageCommand {
             paramLabel = "<path/to/file.png>",
             scope = CommandLine.ScopeType.INHERIT
     )
-    private File outputFile;
+    private File outputFile = null;
 
     @CommandLine.Option(
             names = {"--width"},
