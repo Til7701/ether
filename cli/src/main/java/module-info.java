@@ -7,6 +7,7 @@ module ether.cli {
     requires java.desktop;
     requires javafx.controls;
     requires javafx.graphics;
+    requires jdk.security.jgss;
 
     opens de.holube.ether.cli.commands to info.picocli;
     opens de.holube.ether.cli.commands.generate.image to info.picocli;
