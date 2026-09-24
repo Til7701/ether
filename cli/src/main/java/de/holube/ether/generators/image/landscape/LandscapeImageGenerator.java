@@ -21,8 +21,11 @@ public class LandscapeImageGenerator implements ImageGenerator {
 
     @Override
     public ImageGeneratorResult generate() {
-        Landscape landscape = new Landscape(width, height);
-        landscape.setHeight((i, j, _, _) -> new Landscape.Mapper.Result(sampleHeight(i, j)));
+        Landscape landscape = new Landscape(width, height, seed);
+        landscape.setTerrainHeight((i, j, _, _) -> new Landscape.Mapper.Result(sampleHeight(i, j)));
+        landscape.scale(0.0, 1.5);
+        landscape.fillWaterBelow(0.2);
+        landscape.fancify(10);
         landscape.scale(0.0, 1.0);
 
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -60,10 +63,19 @@ public class LandscapeImageGenerator implements ImageGenerator {
     }
 
     private int createBlackWhiteColor(Landscape.Cell cell) {
-        int value = Math.abs((int) (cell.terrainHeight() * 255.0) % 255);
+        int value = Math.abs((int) (cell.terrainHeight() * 255.0));
+        if (value > 255)
+            value = 255;
+        else if (value < 0)
+            value = 0;
+        int blue = value;
+        if (cell.waterLayer() > 0.1) {
+            value = 0;
+            blue = 255;
+        }
         return ((value & 0xFF) << 16)
                 | ((value & 0xFF) << 8)
-                | (value & 0xFF);
+                | (blue & 0xFF);
     }
 
     private int createColourfulColor(Landscape.Cell cell) {
