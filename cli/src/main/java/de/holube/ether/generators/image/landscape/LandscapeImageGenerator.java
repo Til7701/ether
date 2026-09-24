@@ -21,7 +21,7 @@ public class LandscapeImageGenerator implements ImageGenerator {
 
     @Override
     public ImageGeneratorResult generate() {
-        double[][] heights = new double[width][height];
+        Landscape landscape = new Landscape(width, height);
         MinMax minMax = sampleNoiseHeight(heights);
         normalizeHeights(heights, minMax.min(), minMax.max());
 
@@ -39,22 +39,8 @@ public class LandscapeImageGenerator implements ImageGenerator {
         return new ImageGeneratorResult(image);
     }
 
-    private MinMax sampleNoiseHeight(double[][] heights) {
-        double min = 0;
-        double max = 0;
-        for (int i = 0; i < heights.length; i++) {
-            int rowLength = heights[i].length;
-            for (int j = 0; j < rowLength; j++) {
-                double h = sampleHeight(i, j);
-                if (h < min) min = h;
-                else if (max < h) max = h;
-                heights[i][j] = h;
-            }
-        }
-        return new MinMax(min, max);
-    }
-
-    private record MinMax(double min, double max) {
+    private void sampleNoiseHeight(Landscape landscape) {
+        landscape.setHeights((i, j, _, _) -> new Landscape.Mapper.Result(sampleHeight(i, j)));
     }
 
     private double sampleHeight(int x, int y) {
@@ -75,16 +61,6 @@ public class LandscapeImageGenerator implements ImageGenerator {
         }
 
         return n;
-    }
-
-    private void normalizeHeights(double[][] heights, double min, double max) {
-        for (int i = 0; i < heights.length; i++) {
-            int rowLength = heights[i].length;
-            for (int j = 0; j < rowLength; j++) {
-                double height = heights[i][j];
-                
-            }
-        }
     }
 
     private int createColor(double height) {
@@ -108,6 +84,9 @@ public class LandscapeImageGenerator implements ImageGenerator {
         } else {
             return Color.WHITE.getRGB();
         }
+    }
+
+    private record MinMax(double min, double max) {
     }
 
 }
