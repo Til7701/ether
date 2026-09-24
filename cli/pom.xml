@@ -68,6 +68,7 @@
                     <runtimeImage>target/image</runtimeImage>
                     <resourceDir>jpackage</resourceDir>
                     <type>DEB</type>
+                    <javaOptions>--enable-native-access=javafx.graphics</javaOptions>
                 </configuration>
             </plugin>
         </plugins>
